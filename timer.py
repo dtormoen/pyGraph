@@ -11,14 +11,33 @@ from subprocess import Popen, PIPE
 # #>id,x,y
 
 graphVals = {}
+graphLines = {}
+
+def drawKey(key):
+    pairs = sorted(graphVals[key], key = itemgetter(0))
+    xVals = [pair[0] for pair in pairs]
+    yVals = [pair[1] for pair in pairs]
+    if key in graphLines:
+        graphLines[key].set_xdata(xVals)
+        graphLines[key].set_ydata(yVals)
+    else:
+        line, = plt.plot(xVals,yVals, label=key)
+        graphLines[key] = line
+    ax = plt.gca()
+    ax.relim()
+    ax.autoscale_view()
+    plt.legend(loc=0)
+    plt.draw()
 
 def parseData(label, data):
     if label in graphVals:
         graphVals[label].append(map(int,data))
     else:
         graphVals[label] = [map(int,data)]
+    drawKey(label)
 
 def parse(line):
+    line = [val.strip() for val in line.split(",")]
     if len(line) < 3 and len(line[0]) < 3:
         return
     if line[0][0:2] == '#>':
@@ -31,19 +50,32 @@ def parse(line):
                 return
         parseData(label,data)
 
+plt.ion()
+plt.plot([],[])
+
+
+# def drawGraph():
+#     for key in graphVals:
+#         pairs = sorted(graphVals[key], key = itemgetter(0))
+#         xVals = [pair[0] for pair in pairs]
+#         yVals = [pair[1] for pair in pairs]
+#         if key in lines:
+#             lines[key].set_xdata(xVals)
+#             lines[key].set_ydata(yVals)
+#         else:
+#             line, = plt.plot(xVals,yVals, label=key)
+#             lines[key] = line
+#     ax = plt.gca()
+#     ax.relim()
+#     ax.autoscale_view()
+#     plt.legend(loc=0)
+#     plt.draw()
+
 process = Popen(["tests/simpleTest/simpleTest.py"], stdout=PIPE)
-output = process.communicate()[0]
-output = [[x.strip() for x in row.split(",")] for row in output.split("\n") if len(row) > 0]
-print output
-map(parse,output)
-
-print graphVals
-
-for key in graphVals:
-    pairs = sorted(graphVals[key], key = itemgetter(0))
-    xVals = [pair[0] for pair in pairs]
-    yVals = [pair[1] for pair in pairs]
-    plt.plot(xVals,yVals, label=key)
-plt.legend(loc=0)
+for line in iter(process.stdout.readline, ""):
+    line = line.rstrip("\n")
+    parse(line)
+    # drawGraph()
+    print line
 
 plt.show()
