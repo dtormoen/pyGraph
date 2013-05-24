@@ -53,29 +53,16 @@ def parse(line):
 plt.ion()
 plt.plot([],[])
 
-
-# def drawGraph():
-#     for key in graphVals:
-#         pairs = sorted(graphVals[key], key = itemgetter(0))
-#         xVals = [pair[0] for pair in pairs]
-#         yVals = [pair[1] for pair in pairs]
-#         if key in lines:
-#             lines[key].set_xdata(xVals)
-#             lines[key].set_ydata(yVals)
-#         else:
-#             line, = plt.plot(xVals,yVals, label=key)
-#             lines[key] = line
-#     ax = plt.gca()
-#     ax.relim()
-#     ax.autoscale_view()
-#     plt.legend(loc=0)
-#     plt.draw()
-
 process = Popen(["tests/simpleTest/simpleTest.py"], stdout=PIPE)
 for line in iter(process.stdout.readline, ""):
     line = line.rstrip("\n")
     parse(line)
-    # drawGraph()
     print line
 
 plt.show()
+
+print "Press q to exit"
+userInput = ""
+
+while userInput != 'q':
+    userInput = raw_input(": ")
