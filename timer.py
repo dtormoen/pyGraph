@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pylab as plt
 import matplotlib.pyplot as plt
 import os
+import time
 from operator import itemgetter
 from subprocess import Popen, PIPE
 
@@ -12,6 +13,16 @@ from subprocess import Popen, PIPE
 
 graphVals = {}
 graphLines = {}
+
+lastUpdate = time.time()
+
+def redrawGraph():
+    global lastUpdate
+    newUpdate = time.time()
+    if (newUpdate - lastUpdate) > 1.0:
+        lastUpdate = newUpdate
+        return True
+    return False
 
 def drawKey(key):
     pairs = sorted(graphVals[key], key = itemgetter(0))
@@ -23,11 +34,12 @@ def drawKey(key):
     else:
         line, = plt.plot(xVals,yVals, label=key)
         graphLines[key] = line
-    ax = plt.gca()
-    ax.relim()
-    ax.autoscale_view()
-    plt.legend(loc=0)
-    plt.draw()
+    if redrawGraph():
+        ax = plt.gca()
+        ax.relim()
+        ax.autoscale_view()
+        plt.legend(loc=0)
+        plt.draw()
 
 def parseData(label, data):
     if label in graphVals:
