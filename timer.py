@@ -8,13 +8,10 @@ import time
 from operator import itemgetter
 from subprocess import Popen, PIPE
 
-#language:
-# #>id,x,y
-
 graphVals = {}
 graphLines = {}
 
-lastUpdate = time.time()
+lastUpdate = time.time() - 1
 
 def redrawGraph():
     global lastUpdate
@@ -43,14 +40,14 @@ def drawKey(key):
 
 def parseData(label, data):
     if label in graphVals:
-        graphVals[label].append(map(int,data))
+        graphVals[label].append(map(float,data))
     else:
-        graphVals[label] = [map(int,data)]
+        graphVals[label] = [map(float,data)]
     drawKey(label)
 
 def parse(line):
     line = [val.strip() for val in line.split(",")]
-    if len(line) < 3 and len(line[0]) < 3:
+    if len(line) < 3 or len(line[0]) < 3:
         return
     if line[0][0:2] == '#>':
         label = line[0][2:].strip()
@@ -65,7 +62,7 @@ def parse(line):
 plt.ion()
 plt.plot([],[])
 
-process = Popen(["tests/simpleTest/simpleTest.py"], stdout=PIPE)
+process = Popen(["tests/closestPair/leastDistance.py"], stdout=PIPE)
 for line in iter(process.stdout.readline, ""):
     line = line.rstrip("\n")
     parse(line)
