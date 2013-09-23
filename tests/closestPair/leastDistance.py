@@ -63,7 +63,10 @@ def algorithm(data):
 	return closestPair(sortedy)
 	
 dataPoints = 0
-for x in range(0,2500/10):
+print "#>title,Closest Point"
+print "#>xAxis,Number of Points"
+print "#>yAxis,Time in Seconds"
+for x in range(0,1500/10):
 	dataPoints +=10
 	data = makeData(dataPoints)
 
@@ -74,5 +77,5 @@ for x in range(0,2500/10):
 	t3 = time.time()
 	result2 = algorithm(data)
 	t4 = time.time()
-	print "#>ClosestPairAlgorithm,", dataPoints, ",", t4-t3
+	print "#>DivideAndConquer,", dataPoints, ",", t4-t3
 	sys.stdout.flush() #Needed to make graph update in real time

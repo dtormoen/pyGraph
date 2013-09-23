@@ -5,6 +5,7 @@ import matplotlib.pylab as plt
 import matplotlib.pyplot as plt
 import os
 import time
+import sys
 from operator import itemgetter
 from subprocess import Popen, PIPE
 
@@ -47,10 +48,16 @@ def parseData(label, data):
 
 def parse(line):
     line = [val.strip() for val in line.split(",")]
-    if len(line) < 3 or len(line[0]) < 3:
+    if len(line[0]) < 3:
         return
-    if line[0][0:2] == '#>':
+    if line[0][0:2] == '#>' or len(line[0] <3):
         label = line[0][2:].strip()
+        if label == 'xAxis':
+            plt.xlabel(line[1])
+        elif label == 'yAxis':
+            plt.ylabel(line[1])
+        elif label == 'Title' or label =='title':
+            plt.suptitle(line[1])
         data = []
         for x in line[1:]: 
             try:
@@ -59,19 +66,27 @@ def parse(line):
                 return
         parseData(label,data)
 
-plt.ion()
-plt.plot([],[])
+def main(argv):
+    plt.ion()
+    plt.plot([],[])
 
-process = Popen(["tests/closestPair/leastDistance.py"], stdout=PIPE)
-for line in iter(process.stdout.readline, ""):
-    line = line.rstrip("\n")
-    parse(line)
-    print line
+    if len(argv) < 2:
+        print "Please select a program to analyze"
+        return
 
-plt.show()
+    # process = Popen(["tests/closestPair/leastDistance.py"], stdout=PIPE)
+    process = Popen([argv[1]], stdout=PIPE)
+    for line in iter(process.stdout.readline, ""):
+        line = line.rstrip("\n")
+        parse(line)
+        print line
 
-print "Press q to exit"
-userInput = ""
+    plt.show()
 
-while userInput != 'q':
-    userInput = raw_input(": ")
+    print "Press q to exit"
+    userInput = ""
+
+    while userInput != 'q':
+        userInput = raw_input(": ")
+
+main(sys.argv)
